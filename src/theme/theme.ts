@@ -1,3 +1,5 @@
+import { corporateBrand, superviaBrand } from './brands'
+
 export const tokens = {
   typography: {
     fontFamily:
@@ -26,27 +28,41 @@ export const tokens = {
 } as const
 
 export const brands = {
-  corporate: {
-    label: 'Corporate',
-    colors: {
-      primary: '#006B8F',
-      secondary: '#007E7A',
-      background: '#F4F6F8',
-      card: '#FFFFFF',
-      text: '#1F2933',
-      highlight: '#FFC94A',
-      danger: '#DC2626',
-    },
-  },
+  corporate: corporateBrand,
+  supervia: superviaBrand,
 } as const
 
-export type BrandName = keyof typeof brands
+export type BrandName = 'corporate' | 'supervia'
 
-export const getTheme = (brand: BrandName = 'corporate') => ({
-  colors: brands[brand].colors,
+const buildTheme = (brand: (typeof brands)[BrandName]) => ({
+  colors: {
+    primary: brand.colors.primary,
+    secondary: brand.colors.secondary,
+    background: brand.colors.background,
+    card: brand.colors.surface,
+    text: brand.colors.textPrimary,
+    highlight: brand.colors.warning,
+    danger: brand.colors.danger,
+    textSecondary: brand.colors.textSecondary,
+    border: brand.colors.border,
+    success: brand.colors.success,
+    cta: brand.colors.cta,
+  },
+  layout: brand.layout,
+  shadow: brand.shadow,
   typography: tokens.typography,
   spacing: tokens.spacing,
   radius: tokens.radius,
 })
+
+export const getTheme = (brand: BrandName = 'corporate') => {
+  switch (brand) {
+    case 'supervia':
+      return buildTheme(superviaBrand)
+    case 'corporate':
+    default:
+      return buildTheme(corporateBrand)
+  }
+}
 
 export const theme = getTheme()

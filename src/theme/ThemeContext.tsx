@@ -17,6 +17,14 @@ const applyThemeToRoot = (currentTheme: Theme) => {
   root.style.setProperty('--color-text', currentTheme.colors.text)
   root.style.setProperty('--color-highlight', currentTheme.colors.highlight)
   root.style.setProperty('--color-danger', currentTheme.colors.danger)
+  root.style.setProperty(
+    '--color-text-secondary',
+    currentTheme.colors.textSecondary,
+  )
+  root.style.setProperty('--color-border', currentTheme.colors.border)
+  root.style.setProperty('--color-success', currentTheme.colors.success)
+  root.style.setProperty('--color-warning', currentTheme.colors.warning)
+  root.style.setProperty('--color-cta', currentTheme.colors.cta)
 
   root.style.setProperty('--font-family-base', currentTheme.typography.fontFamily)
   root.style.setProperty('--font-size-sm', currentTheme.typography.fontSizeSm)
@@ -46,6 +54,13 @@ const applyThemeToRoot = (currentTheme: Theme) => {
   root.style.setProperty('--radius-sm', currentTheme.radius.sm)
   root.style.setProperty('--radius-md', currentTheme.radius.md)
   root.style.setProperty('--radius-lg', currentTheme.radius.lg)
+
+  root.style.setProperty('--layout-header-height', currentTheme.layout.headerHeight)
+  root.style.setProperty('--layout-sidebar-width', currentTheme.layout.sidebarWidth)
+  root.style.setProperty('--layout-card-radius', currentTheme.layout.cardRadius)
+  root.style.setProperty('--layout-button-radius', currentTheme.layout.buttonRadius)
+
+  root.style.setProperty('--shadow-card', currentTheme.shadow.card)
 }
 
 type ThemeProviderProps = {
