@@ -7,12 +7,15 @@ export type Theme = typeof theme
 
 const ThemeContext = createContext<Theme>(theme)
 
-const applyThemeToRoot = (currentTheme: Theme) => {
+const applyThemeToRoot = (currentTheme: Theme, brand: BrandName) => {
   const root = document.documentElement
+
+  root.dataset.brand = brand
 
   root.style.setProperty('--color-primary', currentTheme.colors.primary)
   root.style.setProperty('--color-secondary', currentTheme.colors.secondary)
   root.style.setProperty('--color-background', currentTheme.colors.background)
+  root.style.setProperty('--color-surface', currentTheme.colors.surface)
   root.style.setProperty('--color-card', currentTheme.colors.card)
   root.style.setProperty('--color-text', currentTheme.colors.text)
   root.style.setProperty('--color-highlight', currentTheme.colors.highlight)
@@ -56,9 +59,28 @@ const applyThemeToRoot = (currentTheme: Theme) => {
   root.style.setProperty('--radius-lg', currentTheme.radius.lg)
 
   root.style.setProperty('--layout-header-height', currentTheme.layout.headerHeight)
+  root.style.setProperty('--layout-alert-height', currentTheme.layout.alertHeight)
   root.style.setProperty('--layout-sidebar-width', currentTheme.layout.sidebarWidth)
+  root.style.setProperty(
+    '--layout-sidebar-collapsed-width',
+    currentTheme.layout.sidebarCollapsedWidth,
+  )
   root.style.setProperty('--layout-card-radius', currentTheme.layout.cardRadius)
+  root.style.setProperty(
+    '--layout-panel-radius-bottom',
+    currentTheme.layout.panelRadiusBottom,
+  )
   root.style.setProperty('--layout-button-radius', currentTheme.layout.buttonRadius)
+  root.style.setProperty(
+    '--layout-menu-button-radius',
+    currentTheme.layout.menuButtonRadius,
+  )
+  root.style.setProperty('--layout-logo-width', currentTheme.layout.logoWidth)
+  root.style.setProperty('--layout-logo-height', currentTheme.layout.logoHeight)
+  root.style.setProperty(
+    '--layout-system-name-font-size',
+    currentTheme.layout.systemNameFontSize,
+  )
 
   root.style.setProperty('--shadow-card', currentTheme.shadow.card)
 }
@@ -75,8 +97,8 @@ export const ThemeProvider = ({
   const value = useMemo(() => getTheme(brand), [brand])
 
   useEffect(() => {
-    applyThemeToRoot(value)
-  }, [value])
+    applyThemeToRoot(value, brand)
+  }, [brand, value])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

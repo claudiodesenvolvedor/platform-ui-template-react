@@ -19,10 +19,20 @@ export const superviaBrand = {
   },
 
   layout: {
-    headerHeight: '64px',
+    headerHeight: '88px',
+    alertHeight: '32px',
     sidebarWidth: '220px',
-    cardRadius: '10px',
+    sidebarCollapsedWidth: '72px',
+    cardRadius: '4px',
+    panelRadiusBottom: '12px',
     buttonRadius: '999px',
+    menuButtonRadius: '4px',
+    logoWidth: '120px',
+    logoHeight: '48px',
+    systemNameFontSize: '28px',
+  },
+  content: {
+    systemName: 'Sistema Orçamentário',
   },
 
   shadow: {

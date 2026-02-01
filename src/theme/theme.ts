@@ -34,13 +34,16 @@ export const brands = {
 
 export type BrandName = 'corporate' | 'supervia'
 
-const buildTheme = (brand: (typeof brands)[BrandName]) => ({
+const buildTheme = (brand: (typeof brands)[BrandName], brandName: BrandName) => ({
+  brandName,
   colors: {
     primary: brand.colors.primary,
     secondary: brand.colors.secondary,
     background: brand.colors.background,
+    surface: brand.colors.surface,
     card: brand.colors.surface,
     text: brand.colors.textPrimary,
+    warning: brand.colors.warning,
     highlight: brand.colors.warning,
     danger: brand.colors.danger,
     textSecondary: brand.colors.textSecondary,
@@ -49,6 +52,7 @@ const buildTheme = (brand: (typeof brands)[BrandName]) => ({
     cta: brand.colors.cta,
   },
   layout: brand.layout,
+  content: brand.content,
   shadow: brand.shadow,
   typography: tokens.typography,
   spacing: tokens.spacing,
@@ -58,10 +62,10 @@ const buildTheme = (brand: (typeof brands)[BrandName]) => ({
 export const getTheme = (brand: BrandName = 'corporate') => {
   switch (brand) {
     case 'supervia':
-      return buildTheme(superviaBrand)
+      return buildTheme(superviaBrand, 'supervia')
     case 'corporate':
     default:
-      return buildTheme(corporateBrand)
+      return buildTheme(corporateBrand, 'corporate')
   }
 }
 

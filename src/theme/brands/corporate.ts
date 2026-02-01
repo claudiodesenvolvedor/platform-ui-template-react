@@ -20,9 +20,19 @@ export const corporateBrand = {
 
   layout: {
     headerHeight: '64px',
+    alertHeight: '0px',
     sidebarWidth: '220px',
+    sidebarCollapsedWidth: '220px',
     cardRadius: '10px',
+    panelRadiusBottom: '10px',
     buttonRadius: '999px',
+    menuButtonRadius: '6px',
+    logoWidth: '120px',
+    logoHeight: '48px',
+    systemNameFontSize: '20px',
+  },
+  content: {
+    systemName: 'Template Corporativo',
   },
 
   shadow: {
