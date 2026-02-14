@@ -1,4 +1,4 @@
-import { corporateBrand, superviaBrand } from './brands'
+import { corporateBrand, supervia1Brand, superviaBrand } from './brands'
 
 export const tokens = {
   typography: {
@@ -30,9 +30,10 @@ export const tokens = {
 export const brands = {
   corporate: corporateBrand,
   supervia: superviaBrand,
+  supervia1: supervia1Brand,
 } as const
 
-export type BrandName = 'corporate' | 'supervia'
+export type BrandName = 'corporate' | 'supervia' | 'supervia1'
 
 const buildTheme = (brand: (typeof brands)[BrandName], brandName: BrandName) => ({
   brandName,
@@ -61,6 +62,8 @@ const buildTheme = (brand: (typeof brands)[BrandName], brandName: BrandName) => 
 
 export const getTheme = (brand: BrandName = 'corporate') => {
   switch (brand) {
+    case 'supervia1':
+      return buildTheme(supervia1Brand, 'supervia1')
     case 'supervia':
       return buildTheme(superviaBrand, 'supervia')
     case 'corporate':

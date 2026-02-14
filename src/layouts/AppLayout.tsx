@@ -9,6 +9,7 @@ export const AppLayout = () => {
   const { userRole, logout } = useAuth()
   const theme = useTheme()
   const isSupervia = theme.brandName === 'supervia'
+  const isSupervia1 = theme.brandName === 'supervia1'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isSupervia)
 
   useEffect(() => {
@@ -62,6 +63,24 @@ export const AppLayout = () => {
             <span className="app-header__user">Usuário: desconhecido</span>
           </div>
         </header>
+      ) : isSupervia1 ? (
+        <header className="app-header app-header--supervia1">
+          <div className="app-header__brand">
+            <div className="app-header__logo-wrapper">
+              <img
+                className="app-header__logo"
+                src="/assets/supervia-logo.svg"
+                alt="Supervia"
+              />
+            </div>
+            <span className="app-header__brand-text">{theme.content.systemName}</span>
+          </div>
+          <div className="app-header__actions">
+            <button className="app-header__logout" type="button" onClick={logout}>
+              Sair
+            </button>
+          </div>
+        </header>
       ) : (
         <header className="app-header">
           <div className="app-header__brand">
@@ -79,8 +98,18 @@ export const AppLayout = () => {
 
       <div className="app-alert-bar">
         <div className="app-alert-bar__content">
-          <span className="app-alert-bar__spacer" />
-          {isSupervia && (
+          {isSupervia1 ? (
+            <nav className="app-top-nav" aria-label="Menu principal">
+              {availableItems.map((item) => (
+                <NavLink key={item.path} className="app-top-nav__link" to={item.path}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          ) : (
+            <span className="app-alert-bar__spacer" />
+          )}
+          {isSupervia && !isSupervia1 && (
             <button
               className="app-alert-bar__logout"
               type="button"
@@ -92,7 +121,7 @@ export const AppLayout = () => {
         </div>
       </div>
 
-      <aside className="app-sidebar">
+      {!isSupervia1 && <aside className="app-sidebar">
         {isSupervia && (
           <button
             className="app-sidebar__menu-button"
@@ -130,7 +159,7 @@ export const AppLayout = () => {
             ))}
           </nav>
         )}
-      </aside>
+      </aside>}
 
       <main className="app-content">
         <div className="app-content__panel">
