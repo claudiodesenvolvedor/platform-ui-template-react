@@ -552,19 +552,93 @@
 }
 
 [data-brand='supervia1'] .app-supervia1-menu {
+  display: none;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu {
   position: fixed;
   top: calc(var(--supervia1-header-total-height) + 2px);
   left: var(--spacing-lg);
-  width: 220px;
+  width: 240px;
   padding: var(--spacing-xs);
   border-radius: var(--layout-card-radius);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
   z-index: 13;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__list,
+[data-brand='supervia1'] .app-supervia1-flyout-menu__submenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__item {
+  position: relative;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-align: left;
+}
+
+[data-brand='supervia1']
+  .app-supervia1-flyout-menu__item--has-children
+  > .app-supervia1-flyout-menu__action::after {
+  content: '›';
+  margin-left: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__action:hover,
+[data-brand='supervia1']
+  .app-supervia1-flyout-menu__item:focus-within
+  > .app-supervia1-flyout-menu__action {
+  background-color: rgba(11, 45, 107, 0.08);
+  color: var(--color-primary);
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__action:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+[data-brand='supervia1'] .app-supervia1-flyout-menu__submenu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + var(--spacing-xs));
+  min-width: 220px;
+  padding: var(--spacing-xs);
+  border-radius: var(--layout-card-radius);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  display: none;
+  z-index: 14;
+}
+
+[data-brand='supervia1']
+  .app-supervia1-flyout-menu__item:hover
+  > .app-supervia1-flyout-menu__submenu,
+[data-brand='supervia1']
+  .app-supervia1-flyout-menu__item:focus-within
+  > .app-supervia1-flyout-menu__submenu {
+  display: block;
 }
 
 [data-brand='supervia1'] .app-supervia1-menu__item {
@@ -792,9 +866,24 @@
     min-height: auto;
   }
 
+  [data-brand='supervia1'] .app-supervia1-flyout-menu {
+    display: none;
+  }
+
   [data-brand='supervia1'] .app-supervia1-menu {
+    display: flex;
+    position: fixed;
+    top: calc(var(--supervia1-header-total-height) + 2px);
     left: var(--spacing-md);
     width: 200px;
+    padding: var(--spacing-xs);
+    border-radius: var(--layout-card-radius);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    flex-direction: column;
+    gap: 2px;
+    z-index: 13;
   }
 
   [data-brand='supervia1'] .app-content__panel {

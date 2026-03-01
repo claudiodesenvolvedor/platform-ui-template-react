@@ -147,21 +147,91 @@ export const AppLayout = () => {
                 ☰
               </button>
               {isSupervia1MenuOpen && (
-                <nav className="app-supervia1-menu" aria-label="Menu supervia1">
-                  <button className="app-supervia1-menu__item" type="button">
-                    Dashboard
-                  </button>
-                  <div className="app-supervia1-menu__group-title">Cadastros</div>
-                  <button
-                    className="app-supervia1-menu__item app-supervia1-menu__item--child"
-                    type="button"
+                <>
+                  <nav
+                    className="app-supervia1-flyout-menu"
+                    aria-label="Menu desktop supervia1"
                   >
-                    Usuários
-                  </button>
-                  <button className="app-supervia1-menu__item" type="button">
-                    Relatórios
-                  </button>
-                </nav>
+                    <ul className="app-supervia1-flyout-menu__list">
+                      <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Administração
+                        </button>
+                        <ul className="app-supervia1-flyout-menu__submenu">
+                          <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
+                            <button
+                              className="app-supervia1-flyout-menu__action"
+                              type="button"
+                            >
+                              Cadastro
+                            </button>
+                            <ul className="app-supervia1-flyout-menu__submenu">
+                              <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
+                                <button
+                                  className="app-supervia1-flyout-menu__action"
+                                  type="button"
+                                >
+                                  Relacionamentos
+                                </button>
+                                <ul className="app-supervia1-flyout-menu__submenu">
+                                  <li className="app-supervia1-flyout-menu__item">
+                                    <button
+                                      className="app-supervia1-flyout-menu__action"
+                                      type="button"
+                                    >
+                                      Itens
+                                    </button>
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                      <li className="app-supervia1-flyout-menu__item">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Previsão
+                        </button>
+                      </li>
+                      <li className="app-supervia1-flyout-menu__item">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Importação
+                        </button>
+                      </li>
+                      <li className="app-supervia1-flyout-menu__item">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Relatórios
+                        </button>
+                      </li>
+                      <li className="app-supervia1-flyout-menu__item">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Alterações Materiais
+                        </button>
+                      </li>
+                      <li className="app-supervia1-flyout-menu__item">
+                        <button className="app-supervia1-flyout-menu__action" type="button">
+                          Ajuda
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+
+                  <nav className="app-supervia1-menu" aria-label="Menu mobile supervia1">
+                    <button className="app-supervia1-menu__item" type="button">
+                      Dashboard
+                    </button>
+                    <div className="app-supervia1-menu__group-title">Cadastros</div>
+                    <button
+                      className="app-supervia1-menu__item app-supervia1-menu__item--child"
+                      type="button"
+                    >
+                      Usuários
+                    </button>
+                    <button className="app-supervia1-menu__item" type="button">
+                      Relatórios
+                    </button>
+                  </nav>
+                </>
               )}
             </div>
             <div className="app-header__section app-header__section--right app-header__section--supervia1-bottom-right">
@@ -255,7 +325,7 @@ export const AppLayout = () => {
       {isSupervia1 && (
         <footer className="app-footer app-footer--supervia1">
           <span className="app-footer__copyright">
-            {`© Copyright - Direitos reservados à "${companyName}"`}
+            {`© Copyright - Direitos reservados à ${companyName}`}
           </span>
           <span className="app-footer__version">{footerVersionText}</span>
         </footer>
