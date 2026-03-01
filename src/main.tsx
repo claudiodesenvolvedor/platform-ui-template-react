@@ -9,7 +9,7 @@ import { LoaderProvider } from './hooks/loader'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider brand="supervia">
+    <ThemeProvider brand="supervia1">
       <AuthProvider>
         <ToastProvider>
           <LoaderProvider>

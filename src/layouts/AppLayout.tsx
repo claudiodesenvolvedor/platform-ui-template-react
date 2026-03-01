@@ -11,10 +11,45 @@ export const AppLayout = () => {
   const isSupervia = theme.brandName === 'supervia'
   const isSupervia1 = theme.brandName === 'supervia1'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isSupervia)
+  const [isSupervia1MenuOpen, setIsSupervia1MenuOpen] = useState(false)
+  const [appVersion, setAppVersion] = useState(
+    import.meta.env.VITE_APP_VERSION ?? '0.0.0',
+  )
 
   useEffect(() => {
     setIsSidebarCollapsed(isSupervia)
   }, [isSupervia])
+
+  useEffect(() => {
+    if (!isSupervia1) {
+      setIsSupervia1MenuOpen(false)
+      return
+    }
+
+    let isMounted = true
+
+    const loadVersionFromPackageJson = async () => {
+      try {
+        const response = await fetch('/package.json')
+        if (!response.ok) {
+          return
+        }
+
+        const payload = (await response.json()) as { version?: unknown }
+        if (isMounted && typeof payload.version === 'string') {
+          setAppVersion(payload.version)
+        }
+      } catch {
+        // Keep environment fallback when package.json is not available.
+      }
+    }
+
+    void loadVersionFromPackageJson()
+
+    return () => {
+      isMounted = false
+    }
+  }, [isSupervia1])
 
   const availableItems = useMemo(
     () => navigationItems.filter((item) => item.roles.includes(userRole)),
@@ -28,6 +63,12 @@ export const AppLayout = () => {
     () => availableItems.find((item) => item.path === '/users'),
     [availableItems],
   )
+  const environmentName = import.meta.env.MODE
+  const footerVersionText = import.meta.env.PROD
+    ? `v${appVersion}`
+    : `v${appVersion} • ${environmentName}`
+  const userAvatarPlaceholder =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23E6EDF7'/%3E%3Ccircle cx='32' cy='25' r='12' fill='%2390A4C2'/%3E%3Cpath d='M12 56c2-11 10-18 20-18s18 7 20 18' fill='%2390A4C2'/%3E%3C/svg%3E"
 
   return (
     <div
@@ -65,20 +106,69 @@ export const AppLayout = () => {
         </header>
       ) : isSupervia1 ? (
         <header className="app-header app-header--supervia1">
-          <div className="app-header__brand">
-            <div className="app-header__logo-wrapper">
-              <img
-                className="app-header__logo"
-                src="/assets/supervia-logo.svg"
-                alt="Supervia"
-              />
+          <div className="app-header__supervia1-row app-header__supervia1-row--top">
+            <div className="app-header__section app-header__section--left app-header__section--supervia1-left">
+              <div className="app-header__logo-wrapper">
+                <img
+                  className="app-header__logo"
+                  src="/assets/supervia-logo.svg"
+                  alt="Supervia"
+                />
+              </div>
             </div>
-            <span className="app-header__brand-text">{theme.content.systemName}</span>
+            <div className="app-header__section app-header__section--center app-header__section--supervia1-center">
+              <span className="app-header__system-name app-header__system-name--supervia1">
+                Sistema XPTO
+              </span>
+            </div>
+            <div className="app-header__section app-header__section--right app-header__section--supervia1-right">
+              <div className="app-header__avatar-wrap">
+                <img
+                  className="app-header__avatar"
+                  src={userAvatarPlaceholder}
+                  alt="Usuário"
+                />
+              </div>
+            </div>
           </div>
-          <div className="app-header__actions">
-            <button className="app-header__logout" type="button" onClick={logout}>
-              Sair
-            </button>
+          <div className="app-header__supervia1-row app-header__supervia1-row--bottom">
+            <div className="app-header__section app-header__section--left app-header__section--supervia1-bottom-left">
+              <button
+                className="app-header__menu-button app-header__menu-button--supervia1"
+                type="button"
+                aria-label={isSupervia1MenuOpen ? 'Fechar menu' : 'Abrir menu'}
+                aria-expanded={isSupervia1MenuOpen}
+                onClick={() => setIsSupervia1MenuOpen((current) => !current)}
+              >
+                ☰
+              </button>
+              {isSupervia1MenuOpen && (
+                <nav className="app-supervia1-menu" aria-label="Menu supervia1">
+                  <button className="app-supervia1-menu__item" type="button">
+                    Dashboard
+                  </button>
+                  <div className="app-supervia1-menu__group-title">Cadastros</div>
+                  <button
+                    className="app-supervia1-menu__item app-supervia1-menu__item--child"
+                    type="button"
+                  >
+                    Usuários
+                  </button>
+                  <button className="app-supervia1-menu__item" type="button">
+                    Relatórios
+                  </button>
+                </nav>
+              )}
+            </div>
+            <div className="app-header__section app-header__section--right app-header__section--supervia1-bottom-right">
+              <button
+                className="app-header__logout app-header__logout--supervia1"
+                type="button"
+                onClick={logout}
+              >
+                Sair
+              </button>
+            </div>
           </div>
         </header>
       ) : (
@@ -96,30 +186,22 @@ export const AppLayout = () => {
         </header>
       )}
 
-      <div className="app-alert-bar">
-        <div className="app-alert-bar__content">
-          {isSupervia1 ? (
-            <nav className="app-top-nav" aria-label="Menu principal">
-              {availableItems.map((item) => (
-                <NavLink key={item.path} className="app-top-nav__link" to={item.path}>
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-          ) : (
+      {!isSupervia1 && (
+        <div className="app-alert-bar">
+          <div className="app-alert-bar__content">
             <span className="app-alert-bar__spacer" />
-          )}
-          {isSupervia && !isSupervia1 && (
-            <button
-              className="app-alert-bar__logout"
-              type="button"
-              onClick={logout}
-            >
-              Sair
-            </button>
-          )}
+            {isSupervia && (
+              <button
+                className="app-alert-bar__logout"
+                type="button"
+                onClick={logout}
+              >
+                Sair
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {!isSupervia1 && <aside className="app-sidebar">
         {isSupervia && (
@@ -166,6 +248,12 @@ export const AppLayout = () => {
           <Outlet />
         </div>
       </main>
+      {isSupervia1 && (
+        <footer className="app-footer app-footer--supervia1">
+          <span className="app-footer__copyright">© Supervia</span>
+          <span className="app-footer__version">{footerVersionText}</span>
+        </footer>
+      )}
     </div>
   )
 }
