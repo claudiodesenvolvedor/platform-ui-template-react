@@ -67,6 +67,10 @@ export const AppLayout = () => {
   const footerVersionText = import.meta.env.PROD
     ? `v${appVersion}`
     : `v${appVersion} • ${environmentName}`
+  const companyName =
+    'companyName' in theme.content && typeof theme.content.companyName === 'string'
+      ? theme.content.companyName
+      : 'Supervia'
   const userAvatarPlaceholder =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23E6EDF7'/%3E%3Ccircle cx='32' cy='25' r='12' fill='%2390A4C2'/%3E%3Cpath d='M12 56c2-11 10-18 20-18s18 7 20 18' fill='%2390A4C2'/%3E%3C/svg%3E"
 
@@ -250,7 +254,9 @@ export const AppLayout = () => {
       </main>
       {isSupervia1 && (
         <footer className="app-footer app-footer--supervia1">
-          <span className="app-footer__copyright">© Supervia</span>
+          <span className="app-footer__copyright">
+            {`© Copyright - Direitos reservados à "${companyName}"`}
+          </span>
           <span className="app-footer__version">{footerVersionText}</span>
         </footer>
       )}

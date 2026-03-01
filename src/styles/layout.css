@@ -419,7 +419,7 @@
 [data-brand='supervia1'] .app-header {
   --supervia1-header-top-height: var(--layout-header-height);
   --supervia1-header-bottom-height: 34px;
-  --supervia1-footer-height: 44px;
+  --supervia1-footer-height: 48px;
   --supervia1-avatar-size: 58px;
   --supervia1-header-total-height: calc(
     var(--supervia1-header-top-height) + var(--supervia1-header-bottom-height)
@@ -764,7 +764,7 @@
 
   [data-brand='supervia1'] .app-header {
     --supervia1-header-bottom-height: 32px;
-    --supervia1-footer-height: 40px;
+    --supervia1-footer-height: 42px;
     --supervia1-avatar-size: 52px;
   }
 

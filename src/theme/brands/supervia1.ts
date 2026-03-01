@@ -36,6 +36,7 @@ export const supervia1Brand = {
 
   content: {
     systemName: 'Portal SuperVia',
+    companyName: 'Supervia',
   },
 
   behavior: {
