@@ -1,20 +1,33 @@
 import type { UserRole } from '../hooks/auth/AuthContext'
 
-export type NavigationItem = {
+export interface NavigationItem {
+  id: string
   label: string
-  path: string
-  roles: UserRole[]
+  path?: string
+  icon?: string
+  order?: number
+  roles?: UserRole[]
+  children?: NavigationItem[]
 }
 
 export const navigationItems: NavigationItem[] = [
   {
+    id: 'dashboard',
     label: 'Dashboard',
     path: '/',
     roles: ['admin', 'manager', 'viewer'],
   },
   {
-    label: 'Usuários',
-    path: '/users',
+    id: 'administracao',
+    label: 'Administração',
     roles: ['admin', 'manager'],
+    children: [
+      {
+        id: 'usuarios',
+        label: 'Usuários',
+        path: '/users',
+        roles: ['admin', 'manager'],
+      },
+    ],
   },
 ]

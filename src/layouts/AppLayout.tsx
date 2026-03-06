@@ -1,17 +1,22 @@
-import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { navigationItems } from '../config/navigation'
+import type { NavigationItem } from '../config/navigation'
 import { useAuth } from '../hooks/auth'
 import { useTheme } from '../theme'
+import { findBreadcrumb, getAllowedNavigation } from '../utils/navigation'
 import '../styles/layout.css'
 
 export const AppLayout = () => {
   const { userRole, logout } = useAuth()
+  const location = useLocation()
   const theme = useTheme()
   const isSupervia = theme.brandName === 'supervia'
   const isSupervia1 = theme.brandName === 'supervia1'
+  const supervia1FlyoutMenuRef = useRef<HTMLElement | null>(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isSupervia)
   const [isSupervia1MenuOpen, setIsSupervia1MenuOpen] = useState(false)
+  const [hoverTimeout, setHoverTimeout] = useState<number | null>(null)
   const [appVersion, setAppVersion] = useState(
     import.meta.env.VITE_APP_VERSION ?? '0.0.0',
   )
@@ -51,17 +56,15 @@ export const AppLayout = () => {
     }
   }, [isSupervia1])
 
-  const availableItems = useMemo(
-    () => navigationItems.filter((item) => item.roles.includes(userRole)),
-    [userRole],
-  )
-  const dashboardItem = useMemo(
-    () => availableItems.find((item) => item.path === '/'),
-    [availableItems],
-  )
-  const usersItem = useMemo(
-    () => availableItems.find((item) => item.path === '/users'),
-    [availableItems],
+  const availableItems = useMemo(() => {
+    const isVisibleToRole = (item: NavigationItem) =>
+      !item.roles || item.roles.includes(userRole)
+    return navigationItems.filter((item) => Boolean(item.path) && isVisibleToRole(item))
+  }, [userRole])
+  const navigationTree = useMemo(() => getAllowedNavigation(userRole), [userRole])
+  const breadcrumb = useMemo(
+    () => findBreadcrumb(location.pathname),
+    [location.pathname],
   )
   const environmentName = import.meta.env.MODE
   const footerVersionText = import.meta.env.PROD
@@ -73,6 +76,118 @@ export const AppLayout = () => {
       : 'Supervia'
   const userAvatarPlaceholder =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23E6EDF7'/%3E%3Ccircle cx='32' cy='25' r='12' fill='%2390A4C2'/%3E%3Cpath d='M12 56c2-11 10-18 20-18s18 7 20 18' fill='%2390A4C2'/%3E%3C/svg%3E"
+
+  const clearHoverTimeout = () => {
+    if (hoverTimeout !== null) {
+      window.clearTimeout(hoverTimeout)
+      setHoverTimeout(null)
+    }
+  }
+
+  const handleMouseEnter = () => {
+    clearHoverTimeout()
+  }
+
+  const handleMouseLeave = () => {
+    clearHoverTimeout()
+    const timeoutId = window.setTimeout(() => {
+      const menuElement = supervia1FlyoutMenuRef.current
+      const isHoveringMenu =
+        Boolean(menuElement?.matches(':hover')) ||
+        Boolean(menuElement && menuElement.contains(document.activeElement))
+
+      if (!isHoveringMenu) {
+        setIsSupervia1MenuOpen(false)
+      }
+      setHoverTimeout(null)
+    }, 200)
+    setHoverTimeout(timeoutId)
+  }
+
+  const handleNavigateFromMenu = () => {
+    clearHoverTimeout()
+    setIsSupervia1MenuOpen(false)
+  }
+
+  const findLabelByPath = (items: NavigationItem[], path: string): string | undefined => {
+    for (const item of items) {
+      if (item.path === path) {
+        return item.label
+      }
+      if (item.children && item.children.length > 0) {
+        const nestedResult = findLabelByPath(item.children, path)
+        if (nestedResult) {
+          return nestedResult
+        }
+      }
+    }
+    return undefined
+  }
+
+  const dashboardLabel = findLabelByPath(navigationTree, '/') ?? 'Dashboard'
+  const usersLabel = findLabelByPath(navigationTree, '/users') ?? 'Usuários'
+
+  const renderNavigationItems = (
+    items: NavigationItem[],
+    isSubmenu = false,
+  ): JSX.Element => (
+    <ul
+      className={
+        isSubmenu
+          ? 'app-supervia1-flyout-menu__submenu'
+          : 'app-supervia1-flyout-menu__list'
+      }
+    >
+      {items.map((item) => {
+        const hasChildren = Boolean(item.children && item.children.length > 0)
+        return (
+          <li
+            key={item.id}
+            className={`app-supervia1-flyout-menu__item${hasChildren ? ' app-supervia1-flyout-menu__item--has-children' : ''}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {item.path ? (
+              <NavLink
+                className={({ isActive }) =>
+                  isActive
+                    ? 'app-supervia1-flyout-menu__action active'
+                    : 'app-supervia1-flyout-menu__action'
+                }
+                to={item.path}
+                onClick={handleNavigateFromMenu}
+              >
+                {item.label}
+              </NavLink>
+            ) : (
+              <button className="app-supervia1-flyout-menu__action" type="button">
+                {item.label}
+              </button>
+            )}
+
+            {item.children?.length
+              ? renderNavigationItems(item.children, true)
+              : null}
+          </li>
+        )
+      })}
+    </ul>
+  )
+
+  useEffect(() => {
+    if (!isSupervia1) {
+      return
+    }
+
+    clearHoverTimeout()
+    setIsSupervia1MenuOpen(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, isSupervia1])
+
+  useEffect(() => () => clearHoverTimeout(), [hoverTimeout])
+
+  // Prepared for upcoming breadcrumb UI component.
+  void breadcrumb
 
   return (
     <div
@@ -122,7 +237,7 @@ export const AppLayout = () => {
             </div>
             <div className="app-header__section app-header__section--center app-header__section--supervia1-center">
               <span className="app-header__system-name app-header__system-name--supervia1">
-                Sistema XPTO
+                [Nome do Sistema]
               </span>
             </div>
             <div className="app-header__section app-header__section--right app-header__section--supervia1-right">
@@ -151,69 +266,11 @@ export const AppLayout = () => {
                   <nav
                     className="app-supervia1-flyout-menu"
                     aria-label="Menu desktop supervia1"
+                    ref={supervia1FlyoutMenuRef}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                   >
-                    <ul className="app-supervia1-flyout-menu__list">
-                      <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Administração
-                        </button>
-                        <ul className="app-supervia1-flyout-menu__submenu">
-                          <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
-                            <button
-                              className="app-supervia1-flyout-menu__action"
-                              type="button"
-                            >
-                              Cadastro
-                            </button>
-                            <ul className="app-supervia1-flyout-menu__submenu">
-                              <li className="app-supervia1-flyout-menu__item app-supervia1-flyout-menu__item--has-children">
-                                <button
-                                  className="app-supervia1-flyout-menu__action"
-                                  type="button"
-                                >
-                                  Relacionamentos
-                                </button>
-                                <ul className="app-supervia1-flyout-menu__submenu">
-                                  <li className="app-supervia1-flyout-menu__item">
-                                    <button
-                                      className="app-supervia1-flyout-menu__action"
-                                      type="button"
-                                    >
-                                      Itens
-                                    </button>
-                                  </li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </li>
-                      <li className="app-supervia1-flyout-menu__item">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Previsão
-                        </button>
-                      </li>
-                      <li className="app-supervia1-flyout-menu__item">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Importação
-                        </button>
-                      </li>
-                      <li className="app-supervia1-flyout-menu__item">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Relatórios
-                        </button>
-                      </li>
-                      <li className="app-supervia1-flyout-menu__item">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Alterações Materiais
-                        </button>
-                      </li>
-                      <li className="app-supervia1-flyout-menu__item">
-                        <button className="app-supervia1-flyout-menu__action" type="button">
-                          Ajuda
-                        </button>
-                      </li>
-                    </ul>
+                    {renderNavigationItems(navigationTree)}
                   </nav>
 
                   <nav className="app-supervia1-menu" aria-label="Menu mobile supervia1">
@@ -294,14 +351,14 @@ export const AppLayout = () => {
           !isSidebarCollapsed && (
             <nav className="app-nav app-nav--supervia" aria-label="Menu">
               <div className="app-nav__item">
-                {dashboardItem?.label ?? 'Dashboard'}
+                {dashboardLabel}
               </div>
               <div className="app-nav__group">
                 <div className="app-nav__item app-nav__item--parent">
                   Cadastros
                 </div>
                 <div className="app-nav__item app-nav__item--child">
-                  {usersItem?.label ?? 'Usuários'}
+                  {usersLabel}
                 </div>
               </div>
             </nav>

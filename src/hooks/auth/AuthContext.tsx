@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useState } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
 type AuthCredentials = {
@@ -26,12 +26,32 @@ type AuthProviderProps = {
 }
 
 const getStoredToken = () => localStorage.getItem(STORAGE_KEY)
-const getStoredRole = () =>
+const isUserRole = (value: string): value is UserRole =>
+  value === 'admin' || value === 'manager' || value === 'viewer'
+
+const getDevRole = () => {
+  if (!import.meta.env.DEV) {
+    return null
+  }
+
+  const devRole = import.meta.env.VITE_DEV_ROLE
+  return typeof devRole === 'string' && isUserRole(devRole) ? devRole : null
+}
+
+const getStoredRole = (): UserRole =>
   (localStorage.getItem(ROLE_KEY) as UserRole | null) ?? 'viewer'
+
+const getInitialRole = (): UserRole => getDevRole() ?? getStoredRole()
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(() => getStoredToken())
-  const [userRole, setUserRole] = useState<UserRole>(() => getStoredRole())
+  const [userRole, setUserRole] = useState<UserRole>(() => getInitialRole())
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.info('[Auth] Active role:', userRole)
+    }
+  }, [userRole])
 
   const login = useCallback(async ({ email, password }: AuthCredentials) => {
     if (!email || !password) {

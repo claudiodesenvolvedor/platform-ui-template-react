@@ -512,7 +512,7 @@
 
 [data-brand='supervia1'] .app-header__system-name--supervia1 {
   color: var(--color-surface);
-  font-size: calc(var(--layout-system-name-font-size) + 4px);
+  font-size: calc(var(--layout-system-name-font-size) + 18px);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-base);
   text-align: center;
@@ -594,6 +594,7 @@
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
 }
 
 [data-brand='supervia1']
@@ -613,6 +614,12 @@
   color: var(--color-primary);
 }
 
+[data-brand='supervia1'] .app-supervia1-flyout-menu__action.active {
+  background-color: rgba(11, 45, 107, 0.14);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
 [data-brand='supervia1'] .app-supervia1-flyout-menu__action:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
@@ -621,8 +628,9 @@
 [data-brand='supervia1'] .app-supervia1-flyout-menu__submenu {
   position: absolute;
   top: 0;
-  left: calc(100% + var(--spacing-xs));
+  left: 100%;
   min-width: 220px;
+  margin-left: var(--spacing-xs);
   padding: var(--spacing-xs);
   border-radius: var(--layout-card-radius);
   background-color: var(--color-surface);
@@ -634,10 +642,10 @@
 
 [data-brand='supervia1']
   .app-supervia1-flyout-menu__item:hover
-  > .app-supervia1-flyout-menu__submenu,
+  > ul,
 [data-brand='supervia1']
   .app-supervia1-flyout-menu__item:focus-within
-  > .app-supervia1-flyout-menu__submenu {
+  > ul {
   display: block;
 }
 
