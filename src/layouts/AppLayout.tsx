@@ -14,7 +14,7 @@ import {
 import '../styles/layout.css'
 
 export const AppLayout = () => {
-  const { userRole, userRoles, logout } = useAuth()
+  const { isAuthenticated, user, userRole, userRoles, logout } = useAuth()
   const { featureFlags } = useFeatureFlags()
   const location = useLocation()
   const theme = useTheme()
@@ -261,7 +261,7 @@ export const AppLayout = () => {
               <div className="app-header__avatar-wrap">
                 <img
                   className="app-header__avatar"
-                  src={userAvatarPlaceholder}
+                  src={user?.avatarUrl || userAvatarPlaceholder}
                   alt="Usuário"
                 />
               </div>
@@ -274,7 +274,9 @@ export const AppLayout = () => {
                 type="button"
                 aria-label={isSupervia1MenuOpen ? 'Fechar menu' : 'Abrir menu'}
                 aria-expanded={isSupervia1MenuOpen}
-                onClick={() => setIsSupervia1MenuOpen((current) => !current)}
+                onClick={() =>
+                  isAuthenticated && setIsSupervia1MenuOpen((current) => !current)
+                }
               >
                 ☰
               </button>
@@ -287,7 +289,7 @@ export const AppLayout = () => {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    {renderNavigationItems(navigationTree)}
+                    {isAuthenticated ? renderNavigationItems(navigationTree) : null}
                   </nav>
 
                   <nav className="app-supervia1-menu" aria-label="Menu mobile supervia1">
@@ -365,7 +367,7 @@ export const AppLayout = () => {
           </button>
         )}
         {isSupervia ? (
-          !isSidebarCollapsed && (
+          isAuthenticated && !isSidebarCollapsed && (
             <nav className="app-nav app-nav--supervia" aria-label="Menu">
               <div className="app-nav__item">
                 {dashboardLabel}
@@ -381,41 +383,43 @@ export const AppLayout = () => {
             </nav>
           )
         ) : (
-          <nav className="app-nav">
-            {navigationTree.map((item) => {
-              if (item.children?.length) {
-                return (
-                  <div key={item.id} className="app-nav__group">
-                    <div className="app-nav__item app-nav__item--parent">
-                      {item.label}
+          isAuthenticated && (
+            <nav className="app-nav">
+              {navigationTree.map((item) => {
+                if (item.children?.length) {
+                  return (
+                    <div key={item.id} className="app-nav__group">
+                      <div className="app-nav__item app-nav__item--parent">
+                        {item.label}
+                      </div>
+
+                      {item.children.map((child) =>
+                        child.path ? (
+                          <NavLink
+                            key={child.path}
+                            className="app-nav__link app-nav__link--child"
+                            to={child.path}
+                          >
+                            {child.label}
+                          </NavLink>
+                        ) : null,
+                      )}
                     </div>
+                  )
+                }
 
-                    {item.children.map((child) =>
-                      child.path ? (
-                        <NavLink
-                          key={child.path}
-                          className="app-nav__link app-nav__link--child"
-                          to={child.path}
-                        >
-                          {child.label}
-                        </NavLink>
-                      ) : null,
-                    )}
-                  </div>
-                )
-              }
+                if (item.path) {
+                  return (
+                    <NavLink key={item.path} className="app-nav__link" to={item.path}>
+                      {item.label}
+                    </NavLink>
+                  )
+                }
 
-              if (item.path) {
-                return (
-                  <NavLink key={item.path} className="app-nav__link" to={item.path}>
-                    {item.label}
-                  </NavLink>
-                )
-              }
-
-              return null
-            })}
-          </nav>
+                return null
+              })}
+            </nav>
+          )
           
         )}
       </aside>}
