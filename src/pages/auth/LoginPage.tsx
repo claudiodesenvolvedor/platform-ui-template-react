@@ -7,6 +7,13 @@ import { useAuth } from '../../hooks/auth'
 import { useToast } from '../../hooks/toast'
 import '../../styles/auth.css'
 
+export const pageMeta = {
+  path: "/login",
+  label: "Login",
+  roles: ["public"],
+  order: 0
+}
+
 export const LoginPage = () => {
   const navigate = useNavigate()
   const { login, isAuthenticated } = useAuth()

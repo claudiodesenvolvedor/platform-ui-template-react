@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useFeatureFlags } from '../../context/FeatureFlagContext'
 
 type AuthCredentials = {
   email: string
@@ -10,6 +11,8 @@ type AuthContextValue = {
   token: string | null
   isAuthenticated: boolean
   userRole: UserRole
+  userRoles: UserRoles
+  setUserRoles: (roles: UserRoles) => void
   login: (credentials: AuthCredentials) => Promise<void>
   logout: () => void
 }
@@ -18,6 +21,7 @@ const STORAGE_KEY = 'platform-ui-template:token'
 const ROLE_KEY = 'platform-ui-template:role'
 
 export type UserRole = 'admin' | 'manager' | 'viewer'
+type UserRoles = UserRole[]
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
@@ -26,32 +30,47 @@ type AuthProviderProps = {
 }
 
 const getStoredToken = () => localStorage.getItem(STORAGE_KEY)
-const isUserRole = (value: string): value is UserRole =>
+const isUserRole = (value: unknown): value is UserRole =>
   value === 'admin' || value === 'manager' || value === 'viewer'
 
-const getDevRole = () => {
+const getDevRoles = (): UserRoles => {
   if (!import.meta.env.DEV) {
-    return null
+    return []
   }
 
   const devRole = import.meta.env.VITE_DEV_ROLE
-  return typeof devRole === 'string' && isUserRole(devRole) ? devRole : null
+  if (isUserRole(devRole)) {
+    return [devRole]
+  }
+
+  return []
 }
 
 const getStoredRole = (): UserRole =>
   (localStorage.getItem(ROLE_KEY) as UserRole | null) ?? 'viewer'
 
-const getInitialRole = (): UserRole => getDevRole() ?? getStoredRole()
+const getInitialRoles = (): UserRoles => {
+  // Future: backendUser.roles
+  const devRoles = getDevRoles()
+  if (devRoles.length) {
+    return devRoles
+  }
+
+  const storedRole = getStoredRole()
+  return isUserRole(storedRole) ? [storedRole] : ['viewer']
+}
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const { setFeatureFlags } = useFeatureFlags()
   const [token, setToken] = useState<string | null>(() => getStoredToken())
-  const [userRole, setUserRole] = useState<UserRole>(() => getInitialRole())
+  const [userRoles, setUserRoles] = useState<UserRoles>(getInitialRoles)
+  const userRole = userRoles[0] ?? 'viewer'
 
   useEffect(() => {
     if (import.meta.env.DEV) {
-      console.info('[Auth] Active role:', userRole)
+      console.info('[Auth] Active roles:', userRoles)
     }
-  }, [userRole])
+  }, [userRoles])
 
   const login = useCallback(async ({ email, password }: AuthCredentials) => {
     if (!email || !password) {
@@ -62,20 +81,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem(STORAGE_KEY, issuedToken)
     setToken(issuedToken)
 
-    const role: UserRole = email.includes('admin')
-      ? 'admin'
-      : email.includes('gestao')
-        ? 'manager'
-        : 'viewer'
-    localStorage.setItem(ROLE_KEY, role)
-    setUserRole(role)
-  }, [])
+    const response = {
+      roles: (email.includes('admin')
+        ? ['admin']
+        : email.includes('gestao')
+          ? ['manager']
+          : ['viewer']) as UserRole[],
+      features: {
+        users_enabled: true,
+        reports_enabled: true,
+        audit_enabled: false,
+      },
+    }
+
+    localStorage.setItem(ROLE_KEY, response.roles[0] ?? 'viewer')
+    setUserRoles(response.roles)
+    setFeatureFlags(response.features || {})
+  }, [setFeatureFlags])
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
     localStorage.removeItem(ROLE_KEY)
     setToken(null)
-    setUserRole('viewer')
+    setUserRoles(['viewer'])
   }, [])
 
   const value = useMemo(
@@ -83,10 +111,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       token,
       isAuthenticated: Boolean(token),
       userRole,
+      userRoles,
+      setUserRoles,
       login,
       logout,
     }),
-    [token, userRole, login, logout],
+    [token, userRole, userRoles, login, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

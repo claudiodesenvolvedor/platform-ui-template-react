@@ -1,5 +1,12 @@
 import '../../styles/dashboard.css'
 
+export const pageMeta = {
+  path: "/",
+  label: "Dashboard",
+  roles: ["admin", "manager", "viewer"],
+  order: 1
+}
+
 export const DashboardPage = () => {
   return (
     <section className="page dashboard">

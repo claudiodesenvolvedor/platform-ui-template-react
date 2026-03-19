@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactElement } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { navigationItems } from '../config/navigation'
-import type { NavigationItem } from '../config/navigation'
+import type { UserRole } from '../hooks/auth/AuthContext'
+import { useFeatureFlags } from '../context/FeatureFlagContext'
 import { useAuth } from '../hooks/auth'
 import { useTheme } from '../theme'
-import { findBreadcrumb, getAllowedNavigation } from '../utils/navigation'
+import {
+  buildNavigationFromPages,
+  getPages,
+  type NavigationNode,
+  type PageRegistryItem,
+} from '../utils/pageRegistry'
 import '../styles/layout.css'
 
 export const AppLayout = () => {
-  const { userRole, logout } = useAuth()
+  const { userRole, userRoles, logout } = useAuth()
+  const { featureFlags } = useFeatureFlags()
   const location = useLocation()
   const theme = useTheme()
   const isSupervia = theme.brandName === 'supervia'
@@ -17,6 +24,7 @@ export const AppLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isSupervia)
   const [isSupervia1MenuOpen, setIsSupervia1MenuOpen] = useState(false)
   const [hoverTimeout, setHoverTimeout] = useState<number | null>(null)
+  const [pages, setPages] = useState<PageRegistryItem[]>([])
   const [appVersion, setAppVersion] = useState(
     import.meta.env.VITE_APP_VERSION ?? '0.0.0',
   )
@@ -56,15 +64,27 @@ export const AppLayout = () => {
     }
   }, [isSupervia1])
 
-  const availableItems = useMemo(() => {
-    const isVisibleToRole = (item: NavigationItem) =>
-      !item.roles || item.roles.includes(userRole)
-    return navigationItems.filter((item) => Boolean(item.path) && isVisibleToRole(item))
-  }, [userRole])
-  const navigationTree = useMemo(() => getAllowedNavigation(userRole), [userRole])
-  const breadcrumb = useMemo(
-    () => findBreadcrumb(location.pathname),
-    [location.pathname],
+  useEffect(() => {
+    void getPages().then(setPages)
+  }, [])
+
+  const allowedPages = useMemo(
+    () =>
+      pages.filter((page) => {
+        const hasPermission =
+          !page.roles || page.roles.some((role) => userRoles.includes(role as UserRole))
+
+        const isEnabled =
+          !page.featureFlag || featureFlags?.[page.featureFlag] !== false
+
+        return hasPermission && isEnabled
+      }),
+    [pages, userRoles, featureFlags],
+  )
+
+  const navigationTree = useMemo(
+    () => buildNavigationFromPages(allowedPages),
+    [allowedPages],
   )
   const environmentName = import.meta.env.MODE
   const footerVersionText = import.meta.env.PROD
@@ -109,7 +129,7 @@ export const AppLayout = () => {
     setIsSupervia1MenuOpen(false)
   }
 
-  const findLabelByPath = (items: NavigationItem[], path: string): string | undefined => {
+  const findLabelByPath = (items: NavigationNode[], path: string): string | undefined => {
     for (const item of items) {
       if (item.path === path) {
         return item.label
@@ -128,9 +148,9 @@ export const AppLayout = () => {
   const usersLabel = findLabelByPath(navigationTree, '/users') ?? 'Usuários'
 
   const renderNavigationItems = (
-    items: NavigationItem[],
+    items: NavigationNode[],
     isSubmenu = false,
-  ): JSX.Element => (
+  ): ReactElement => (
     <ul
       className={
         isSubmenu
@@ -185,9 +205,6 @@ export const AppLayout = () => {
   }, [location.pathname, isSupervia1])
 
   useEffect(() => () => clearHoverTimeout(), [hoverTimeout])
-
-  // Prepared for upcoming breadcrumb UI component.
-  void breadcrumb
 
   return (
     <div
@@ -365,12 +382,41 @@ export const AppLayout = () => {
           )
         ) : (
           <nav className="app-nav">
-            {availableItems.map((item) => (
-              <NavLink key={item.path} className="app-nav__link" to={item.path}>
-                {item.label}
-              </NavLink>
-            ))}
+            {navigationTree.map((item) => {
+              if (item.children?.length) {
+                return (
+                  <div key={item.id} className="app-nav__group">
+                    <div className="app-nav__item app-nav__item--parent">
+                      {item.label}
+                    </div>
+
+                    {item.children.map((child) =>
+                      child.path ? (
+                        <NavLink
+                          key={child.path}
+                          className="app-nav__link app-nav__link--child"
+                          to={child.path}
+                        >
+                          {child.label}
+                        </NavLink>
+                      ) : null,
+                    )}
+                  </div>
+                )
+              }
+
+              if (item.path) {
+                return (
+                  <NavLink key={item.path} className="app-nav__link" to={item.path}>
+                    {item.label}
+                  </NavLink>
+                )
+              }
+
+              return null
+            })}
           </nav>
+          
         )}
       </aside>}
 

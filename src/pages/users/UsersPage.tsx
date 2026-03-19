@@ -14,6 +14,14 @@ const initialUsers = [
   { id: 'USR-1004', name: 'Caio Batista', role: 'Supervisor', status: 'Inativo' },
 ]
 
+export const pageMeta = {
+  path: "/users",
+  label: "Usuários",
+  roles: ["admin", "manager"],
+  group: "Administração",
+  order: 2
+}
+
 export const UsersPage = () => {
   const [users, setUsers] = useState(initialUsers)
   const { showLoader, hideLoader } = useLoader()
