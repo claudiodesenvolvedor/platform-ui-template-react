@@ -1,44 +1,14 @@
-# UI GUIDE
+# Documento Complementar: UI Guide
 
-Este guia define o padrão visual e de uso dos principais elementos do template.
+Este guia foi consolidado para evitar duplicidade de regras visuais.
 
-## Paleta
+Referencias oficiais:
 
-- Primary: #006B8F
-- Secondary: #007E7A
-- Background: #F4F6F8
-- Card: #FFFFFF
-- Text: #1F2933
-- Highlight: #FFC94A
-- Danger: #DC2626
+- `01_ARQUITETURA.md` (tokens, brand e layout)
+- `08_REGRAS_DE_GOVERNANCA.md` (limites de alteracao)
+- `09_BOAS_PRATICAS.md` (padroes de implementacao)
 
-Todas as cores devem vir do tema, nunca hardcode.
+Regra central:
 
-## Tipografia
-
-- Fonte base: Inter (fallback para system-ui)
-- Tamanhos:
-  - Sm: 14px
-  - Md: 16px
-  - Lg: 20px
-  - Xl: 24px
-- Pesos: 400 / 500 / 600
-- Line height: 1.5
-
-## Layout
-
-- Header fixo: 64px
-- Sidebar fixa: 220px
-- Content: padding mínimo de 24px
-- Fundo claro e cards brancos
-
-## Exemplos de telas
-
-- Dashboard com KPIs, gráfico e tabela
-- Usuários com listagem e formulário
-
-## Componentes
-
-- Button: variantes primary, secondary, ghost
-- Card: container padrão
-- Input: label + input com estados de foco
+- Cores e tipografia devem ser consumidas via `theme/tokens`.
+- Evitar hardcode de valores visuais em paginas e componentes.
