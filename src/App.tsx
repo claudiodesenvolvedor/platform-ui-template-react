@@ -7,6 +7,7 @@ import { useAuth } from './hooks/auth'
 import type { UserRole } from './hooks/auth/AuthContext'
 import { AppLayout } from './layouts/AppLayout'
 import { LoginPage } from './pages/auth/LoginPage'
+import { getFeatureFlag } from './utils/featureFlags'
 import { getPages } from './utils/pageRegistry'
 import { resolveComponent } from './utils/routes'
 
@@ -50,8 +51,9 @@ function AppRoutes() {
           <Route element={<AppContent />}>
             {routes.map((route) => {
               const { path, PageComponent, roles } = route
-              const isFeatureEnabled =
-                !route.featureFlag || featureFlags?.[route.featureFlag] !== false
+              const isFeatureEnabled = route.featureFlag
+                ? getFeatureFlag(route.featureFlag, featureFlags)
+                : true
               const allowed =
                 (!roles?.length || roles.some((r) => userRoles.includes(r as UserRole))) &&
                 isFeatureEnabled

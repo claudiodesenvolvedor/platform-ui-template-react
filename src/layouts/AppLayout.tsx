@@ -11,6 +11,7 @@ import {
   type NavigationNode,
   type PageRegistryItem,
 } from '../utils/pageRegistry'
+import { getFeatureFlag } from '../utils/featureFlags'
 import '../styles/layout.css'
 
 export const AppLayout = () => {
@@ -74,8 +75,9 @@ export const AppLayout = () => {
         const hasPermission =
           !page.roles || page.roles.some((role) => userRoles.includes(role as UserRole))
 
-        const isEnabled =
-          !page.featureFlag || featureFlags?.[page.featureFlag] !== false
+        const isEnabled = page.featureFlag
+          ? getFeatureFlag(page.featureFlag, featureFlags)
+          : true
 
         return hasPermission && isEnabled
       }),
@@ -87,6 +89,7 @@ export const AppLayout = () => {
     [allowedPages],
   )
   const environmentName = import.meta.env.MODE
+  const appName = import.meta.env.VITE_APP_NAME || 'Sistema Corporativo'
   const footerVersionText = import.meta.env.PROD
     ? `v${appVersion}`
     : `v${appVersion} • ${environmentName}`
@@ -208,7 +211,7 @@ export const AppLayout = () => {
 
   return (
     <div
-      className={`app-layout${isSidebarCollapsed ? ' app-layout--sidebar-collapsed' : ''}`}
+      className={`app-layout${isSidebarCollapsed ? ' app-layout--sidebar-collapsed' : ''}${!isAuthenticated ? ' app-layout--unauthenticated' : ''}`}
     >
       {isSupervia ? (
         <header className="app-header app-header--supervia">
@@ -254,7 +257,7 @@ export const AppLayout = () => {
             </div>
             <div className="app-header__section app-header__section--center app-header__section--supervia1-center">
               <span className="app-header__system-name app-header__system-name--supervia1">
-                [Nome do Sistema]
+                {appName}
               </span>
             </div>
             <div className="app-header__section app-header__section--right app-header__section--supervia1-right">

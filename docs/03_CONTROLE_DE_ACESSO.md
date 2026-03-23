@@ -38,3 +38,8 @@ setUserRoles(response.roles)
 ## Suporte a multiplas roles
 
 O usuario pode possuir mais de um papel (ex.: `['manager', 'viewer']`), sem alterar estrutura de pagina ou roteamento.
+
+## Relacao com avatar
+
+Avatar nao altera permissao.  
+`avatarUrl` e dado de perfil visual e deve ser tratado separadamente de `roles`.

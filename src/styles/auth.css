@@ -11,6 +11,14 @@
   );
 }
 
+.auth-screen .card-container {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  padding: 24px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;

@@ -6,7 +6,11 @@ export const AppContent = () => {
   const { isAuthenticated } = useAuth()
 
   if (!isAuthenticated) {
-    return <LoginPage />
+    return (
+      <div className="app-auth-container">
+        <LoginPage />
+      </div>
+    )
   }
 
   return <Outlet />

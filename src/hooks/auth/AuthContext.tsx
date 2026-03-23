@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { useFeatureFlags } from '../../context/FeatureFlagContext'
 import { api } from '../../services/api'
 import type { LoginResponse } from '../../types/auth'
+import { getEnvBoolean } from '../../utils/env'
 
 type AuthCredentials = {
   email: string
@@ -14,6 +15,8 @@ type AuthContextValue = {
   isAuthenticated: boolean
   isBackendAvailable: boolean
   user: LoginResponse['user'] | null
+  setUser: (user: LoginResponse['user'] | null) => void
+  updateUser: (data: Partial<LoginResponse['user']>) => void
   userRole: UserRole
   userRoles: UserRoles
   setUserRoles: (roles: UserRoles) => void
@@ -90,6 +93,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [userRoles])
 
+  const setUserProfile = useCallback((nextUser: LoginResponse['user'] | null) => {
+    setUser(nextUser)
+    if (nextUser) {
+      localStorage.setItem(USER_KEY, JSON.stringify(nextUser))
+      localStorage.setItem('user', JSON.stringify(nextUser))
+      return
+    }
+
+    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem('user')
+  }, [])
+
+  const updateUser = useCallback((data: Partial<LoginResponse['user']>) => {
+    setUser((prev) => {
+      const currentUser = prev ?? { name: '', email: '', avatarUrl: '' }
+      const updated = { ...currentUser, ...data }
+
+      localStorage.setItem(USER_KEY, JSON.stringify(updated))
+      localStorage.setItem('user', JSON.stringify(updated))
+
+      return updated
+    })
+  }, [])
+
   const login = useCallback(async ({ email, password }: AuthCredentials) => {
     if (!email || !password) {
       throw new Error('Credenciais inválidas')
@@ -108,15 +135,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setIsBackendAvailable(true)
       setToken(data.token)
-      setUser(data.user ?? null)
+      setUserProfile(data.user ?? null)
       setUserRoles(resolvedRoles)
       setFeatureFlags(data.features || {})
 
       localStorage.setItem(STORAGE_KEY, data.token)
       localStorage.setItem('token', data.token)
       localStorage.setItem(ROLE_KEY, resolvedRoles[0] ?? 'viewer')
-      localStorage.setItem(USER_KEY, JSON.stringify(data.user ?? null))
-      localStorage.setItem('user', JSON.stringify(data.user ?? null))
 
       console.info('[Auth] roles:', data.roles)
       console.info('[Auth] features:', data.features)
@@ -125,6 +150,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error('Login failed', error)
       const isTimeout = error?.code === 'ECONNABORTED'
       const isNetworkError = !error?.response
+      const isFallbackEnabled = getEnvBoolean(import.meta.env.VITE_ENABLE_AUTH_FALLBACK)
+
+      if (!isFallbackEnabled) {
+        setIsBackendAvailable(false)
+        throw new Error(
+          isTimeout || isNetworkError
+            ? 'Backend indisponível no momento. Tente novamente.'
+            : 'Falha na autenticação. Verifique suas credenciais.',
+        )
+      }
 
       if (isTimeout || isNetworkError) {
         console.warn('[Auth] Backend indisponivel - usando fallback local')
@@ -143,7 +178,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setUserRoles(fallbackRoles)
       setFeatureFlags({})
       setToken('mock-token-local')
-      setUser({
+      setUserProfile({
         name: email,
         email,
         avatarUrl: 'https://i.pravatar.cc/150?img=5',
@@ -152,15 +187,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem(STORAGE_KEY, 'mock-token-local')
       localStorage.setItem('token', 'mock-token-local')
       localStorage.setItem(ROLE_KEY, fallbackRoles[0] ?? 'viewer')
-      const fallbackUser = {
-        name: email,
-        email,
-        avatarUrl: 'https://i.pravatar.cc/150?img=5',
-      }
-      localStorage.setItem(USER_KEY, JSON.stringify(fallbackUser))
-      localStorage.setItem('user', JSON.stringify(fallbackUser))
     }
-  }, [setFeatureFlags])
+  }, [setFeatureFlags, setUserProfile])
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
@@ -169,10 +197,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem(USER_KEY)
     localStorage.removeItem('user')
     setToken(null)
-    setUser(null)
+    setUserProfile(null)
     setUserRoles(['viewer'])
     setFeatureFlags({})
-  }, [])
+  }, [setFeatureFlags, setUserProfile])
 
   const value = useMemo(
     () => ({
@@ -180,13 +208,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated: Boolean(token),
       isBackendAvailable,
       user,
+      setUser: setUserProfile,
+      updateUser,
       userRole,
       userRoles,
       setUserRoles,
       login,
       logout,
     }),
-    [token, isBackendAvailable, user, userRole, userRoles, login, logout],
+    [
+      token,
+      isBackendAvailable,
+      user,
+      setUserProfile,
+      updateUser,
+      userRole,
+      userRoles,
+      login,
+      logout,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

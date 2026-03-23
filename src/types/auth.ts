@@ -3,7 +3,7 @@ export interface LoginResponse {
   user: {
     name: string
     email: string
-    avatarUrl: string
+    avatarUrl?: string
   }
   roles: string[]
   features: Record<string, boolean>

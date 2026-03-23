@@ -4,8 +4,9 @@
 
 ```text
 Login
-  -> Backend retorna roles + features
+  -> Backend retorna user + roles + features
   -> AuthContext aplica userRoles
+  -> AuthContext aplica user/avatar
   -> FeatureFlagContext aplica featureFlags
   -> pageRegistry descobre paginas e metadados
   -> App.tsx monta rotas lazy
@@ -22,6 +23,7 @@ Login
 4. **Roteamento**: rotas dinamicas com lazy loading.
 5. **Navegacao**: menu agrupado com `group` e `order`.
 6. **Bloqueio**: pagina so abre quando role e feature permitirem.
+7. **Avatar**: ao atualizar `avatarUrl` via `updateUser`, header reflete imediatamente.
 
 ## Resultado
 
