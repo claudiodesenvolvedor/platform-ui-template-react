@@ -1,142 +1,108 @@
-🚀 Platform UI Template
+# Platform UI Template
 
-Plataforma frontend corporativa baseada em React + Vite + TypeScript, projetada para padronização, escalabilidade e reutilização entre múltiplos projetos.
+Template frontend corporativo baseado em React + Vite + TypeScript.
 
-Este projeto representa uma abordagem moderna de arquitetura frontend, desacoplada de regras de negócio e pronta para integração com diferentes backends.
+O objetivo é fornecer uma base padronizada, escalável e desacoplada de regras de negócio, pronta para integração com backend e reutilização entre múltiplos projetos.
 
-📌 Visão Geral
+---
 
-A Platform UI Template foi criada para resolver desafios comuns em ambientes corporativos:
+## Visão Geral
 
-Falta de padronização visual
+Este projeto foi criado para resolver problemas comuns em aplicações frontend corporativas:
 
-Arquiteturas inconsistentes entre sistemas
+- falta de padronização
+- arquiteturas inconsistentes
+- retrabalho entre sistemas
+- dificuldade de manutenção
+- onboarding lento
 
-Retrabalho entre projetos
+A proposta é centralizar decisões arquiteturais e fornecer uma base sólida para novos desenvolvimentos.
 
-Dificuldade de manutenção
+---
 
-Onboarding lento de novos desenvolvedores
+## Objetivos
 
-A solução propõe uma base única, reutilizável e extensível, reduzindo complexidade e aumentando a produtividade dos times.
+- padronizar desenvolvimento frontend
+- reduzir retrabalho
+- garantir consistência visual e estrutural
+- facilitar manutenção e evolução
+- permitir extensibilidade sem acoplamento
 
-🎯 Objetivos
+---
 
-Padronizar layout, componentes e navegação
+## Stack
 
-Reduzir tempo de criação de novos sistemas
+- React
+- Vite
+- TypeScript
+- React Router
+- Axios
+- Context API
+- CSS com variáveis globais
 
-Garantir consistência arquitetural
+---
 
-Facilitar manutenção e evolução
+## Estrutura
 
-Permitir múltiplas identidades visuais (multi-brand)
-
-Preparar o frontend para mudanças organizacionais
-
-🧱 Stack Tecnológica
-
-React + Vite + TypeScript
-
-React Router
-
-Axios
-
-Context API
-
-CSS com variáveis globais
-
-Design Tokens + Brand Config
-
-Feature Flags (backend + fallback via ENV)
-
-Controle de acesso por roles
-
-Navegação automática (auto-discovery)
-
-Lazy loading de páginas
-
-🏗️ Arquitetura
-
-O projeto segue uma estrutura organizada por responsabilidade:
 
 src/
- ├── layouts/      # Layout corporativo (header, sidebar, content)
- ├── pages/        # Páginas da aplicação (auto-discovery)
- ├── components/   # Componentes reutilizáveis
- ├── hooks/        # Contextos globais (auth, loader, toast)
- ├── services/     # Integração com backend (API)
- ├── utils/        # Utilitários (routes, registry, feature flags)
- ├── theme/        # Design Tokens + Brand Config
- ├── styles/       # Estilos globais
-⚙️ Funcionalidades Principais
-🔐 Autenticação e Controle de Acesso
+layouts/ # layout principal (header, sidebar, content)
+pages/ # páginas da aplicação (auto-discovery)
+components/ # componentes reutilizáveis
+hooks/ # contextos globais (auth, loader, toast)
+services/ # integração com backend
+utils/ # utilitários (routes, registry, feature flags)
+theme/ # design tokens e configuração de marca
+styles/ # estilos globais
 
-Login integrado ao layout
 
-Controle por roles
+---
 
-Proteção de rotas
+## Principais Funcionalidades
 
-Persistência de sessão
+### Navegação automática
+- descoberta de páginas via `import.meta.glob`
+- geração automática de rotas
+- lazy loading
 
-🧭 Navegação Automática
+### Controle de acesso
+- roles vindas do backend ou ambiente
+- proteção de rotas
+- suporte a sub-rotas
 
-Descoberta automática de páginas (import.meta.glob)
+### Feature Flags
+- controle via backend
+- fallback via `.env`
+- regra: backend → env → default (true)
 
-Geração automática de rotas
+### Autenticação
+- estado global via Context API
+- persistência em localStorage
+- login integrado ao layout
 
-Menu dinâmico baseado em permissões
+### Design System
+- tokens centralizados
+- suporte a múltiplas marcas
+- componentes base (Button, Input, Card)
 
-🎛️ Feature Flags
+---
 
-Controle dinâmico via backend
+## Páginas de Exemplo
 
-Fallback via .env
+Páginas utilizadas para demonstração foram isoladas em:
 
-Comportamento previsível (backend → env → default)
-
-🎨 Design System
-
-Design Tokens centralizados
-
-Suporte a múltiplas marcas (multi-brand)
-
-Componentes base (Button, Input, Card)
-
-Total liberdade para uso de bibliotecas externas
-
-👤 Contexto de Usuário
-
-Estado global de autenticação
-
-Atualização reativa (ex: avatar)
-
-Persistência automática
-
-🧪 Páginas de Exemplo
-
-As páginas utilizadas para demonstração foram isoladas em:
 
 src/examples/demo-pages/
 
-Esses arquivos servem como referência de implementação e não fazem parte do fluxo real da aplicação.
 
-🔌 Integração com Backend
+Esses arquivos servem como referência de implementação e não fazem parte do fluxo principal da aplicação.
 
-A aplicação está preparada para integração com APIs reais:
+---
 
-Cliente HTTP centralizado (Axios)
+## Configuração
 
-Timeout configurável
+Exemplo de variáveis:
 
-Fallback controlado para ambiente local
-
-Suporte a autenticação e autorização
-
-⚙️ Configuração
-
-Variáveis principais:
 
 VITE_API_URL=
 VITE_API_TIMEOUT=
@@ -144,50 +110,46 @@ VITE_APP_NAME=
 VITE_DEV_ROLE=
 VITE_ENABLE_AUTH_FALLBACK=
 
-# Feature Flags (fallback)
 VITE_FEATURE_USERS=
 VITE_FEATURE_REPORTS=
-📚 Documentação
+VITE_FEATURE_AUDIT=
 
-A pasta /docs contém:
 
-Arquitetura detalhada
+---
 
-Fluxos de navegação
+## Integração com Backend
 
-Controle de acesso
+- cliente HTTP centralizado (Axios)
+- suporte a autenticação
+- controle de acesso por roles
+- suporte a feature flags
 
-Integração com backend
+---
 
-Boas práticas
+## Como rodar
 
-🧠 Conceito Arquitetural
 
-Este template segue o princípio:
-
-A interface reage ao estado — não é manipulada diretamente.
-
-Baseado em:
-
-UI reativa (React)
-
-Separação de responsabilidades
-
-Desacoplamento de regras de negócio
-
-Extensibilidade controlada
-
-🚀 Como Usar
 npm install
 npm run dev
-🏁 Status do Projeto
 
-✔ Estrutura base consolidada
-✔ Integração com backend funcional
-✔ Feature flags implementadas
-✔ Navegação automática
-✔ Pronto para uso em ambiente corporativo
 
-👨‍💻 Autor
+---
+
+## Princípios
+
+- UI baseada em estado (React)
+- separação de responsabilidades
+- desacoplamento de regras de negócio
+- foco em reutilização
+
+---
+
+## Status
+
+Projeto em evolução, já utilizado como base para aplicações corporativas.
+
+---
+
+## Autor
 
 Claudio Carvalho
